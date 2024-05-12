@@ -23,6 +23,21 @@ function formatTime(timeString) {
     return `${hours}:${minutes}:${seconds}`;
 }
 
+// Function to convert date from DDMMYYYY format to YYYY-MM-DD format
+function convertDateToDatabaseFormat(dateString) {
+    const day = dateString.substring(0, 2);
+    const month = dateString.substring(2, 4);
+    const year = dateString.substring(4, 8);
+    return `${year}-${month}-${day}`;
+}
+
+// Function to validate date format
+function isValidDate(dateString) {
+    const regex = /^\d{8}$/; // Assumes date format is DDMMYYYY
+    return regex.test(dateString);
+}
+
+
 // Function to get punch times based on conditions
 function getPunchTimes(records, userID) {
     const punches = {};
@@ -67,12 +82,25 @@ function getPunchTimes(records, userID) {
 
     return punchTimes;
 }
-
 // Define GET endpoint to retrieve all attendance records
 app.get('/api/attendance', async (req, res) => {
     try {
+
+        // Extract parameters from request query
+        const { action, date_range, range, format } = req.query;
+
+        // Validate parameters
+        if (action !== 'get' || !date_range || !range || format !== 'xml') {
+            return res.status(400).json({ error: 'Invalid parameters' });
+        }
+
+        // Split date range into start and end dates and convert to database format
+        const [startDate, endDate] = date_range.split('-').map(convertDateToDatabaseFormat);
+
         const pool = await sql.connect(config);
-        const result = await pool.request().query('SELECT * FROM [HIKCENTRAL].[dbo].[Attendance]');
+        // Adjust SQL query to filter by date range
+        const result = await pool.request()
+            .query(`SELECT * FROM [HIKCENTRAL].[dbo].[Attendance] WHERE Accessdate BETWEEN '${startDate}' AND '${endDate}'`);
 
         // Group records by employee ID and access date
         const groupedRecords = {};
@@ -154,6 +182,11 @@ app.get('/api/attendance', async (req, res) => {
     }
 });
 
+// Function to validate date format
+function isValidDate(dateString) {
+    const regex = /^\d{8}$/; // Assumes date format is YYYYMMDD
+    return regex.test(dateString);
+}
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

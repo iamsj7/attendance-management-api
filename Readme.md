@@ -1,4 +1,4 @@
-## Attendance Management API
+# Attendance Management API
 
 This project is an API for managing attendance records stored in a SQL Server database. It provides functionality to retrieve attendance data for a specified date range and format the response as XML.
 
@@ -97,19 +97,58 @@ npm start
 
 Punch times represent the times at which an employee checks in or checks out. Each punch time corresponds to a specific check-in or check-out event on a particular date. The API handles multiple check-ins and check-outs for each employee on the same date by providing punch times for each event, up to a maximum of 12 punch times per day.
 
+```sql
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Attendance](
+    [Employeeid] [int] NOT NULL,
+    [Accessdateandtime] [varchar](200) NULL,
+      NULL,
+      NULL,
+    [AuthenticationResult] [varchar](200) NULL,
+    [AuthenticationType] [varchar](200) NULL,
+      NULL,
+    [DeviceSerialNo] [varchar](200) NULL,
+      NULL,
+      NULL,
+      NULL,
+      NULL,
+      NULL,
+      NULL,
+      NULL,
+    [AttendanceStatus] [varchar](200) NULL
+) ON [PRIMARY]
+GO
+```
+
 ## Database Schema
 
 The database schema consists of a single table named `Attendance` with the following columns:
 
-- Employeeid (nvarchar)
-- Accessdate (date)
-- Accesstime (time)
-- AttendanceStatus (nvarchar)
-- FirstName (nvarchar)
-- LastName (nvarchar)
+- **Employeeid** (int): Employee ID.
+- **Accessdateandtime** (varchar): Access date and time.
+- **Accessdate** (varchar): Access date.
+- **Accesstime** (varchar): Access time.
+- **AuthenticationResult** (varchar): Authentication result.
+- **AuthenticationType** (varchar): Authentication type.
+- **DeviceName** (varchar): Device name.
+- **DeviceSerialNo** (varchar): Device serial number.
+- **ResourceName** (varchar): Resource name.
+- **ReaderName** (varchar): Reader name.
+- **FirstName** (varchar): First name of the person.
+- **LastName** (varchar): Last name of the person.
+- **PersonName** (varchar): Person's name.
+- **PersonGroup** (varchar): Person's group.
+- **CardNumber** (varchar): Card number.
+- **AttendanceStatus** (varchar): Attendance status.
+
+```
 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
+```

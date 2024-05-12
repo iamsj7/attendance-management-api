@@ -4,6 +4,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const sql = require('mssql');
 const { connect, config } = require('./db'); // Importing connect function and config from db.js
+const { xml } = require('xml');
 
 // Connect to SQL Server
 connect();
@@ -19,7 +20,7 @@ function formatDate(dateString) {
 // Function to format time (assuming time is in format HH:MM:SS)
 function formatTime(timeString) {
     const [hours, minutes, seconds] = timeString.split(':');
-    return `${hours}:${minutes}`;
+    return `${hours}:${minutes}:${seconds}`;
 }
 
 // Function to get punch times based on conditions
@@ -122,7 +123,31 @@ app.get('/api/attendance', async (req, res) => {
             };
         });
 
-        res.json(formattedData);
+        // Convert formatted data to XML format
+        const formattedXML = `<DocumentElement>${formattedData.map(record => {
+            return `<attendance-daily>
+    <UserID>${record.UserID}</UserID>
+    <UserName>${record.UserName}</UserName>
+    <ProcessDate>${record.ProcessDate}</ProcessDate>
+    <Punch1_Time>${record.Punch1_Time}</Punch1_Time>
+    <Punch2_Time>${record.Punch2_Time}</Punch2_Time>
+    <Punch3_Time>${record.Punch3_Time}</Punch3_Time>
+    <Punch4_Time>${record.Punch4_Time}</Punch4_Time>
+    <Punch5_Time>${record.Punch5_Time}</Punch5_Time>
+    <Punch6_Time>${record.Punch6_Time}</Punch6_Time>
+    <Punch7_Time>${record.Punch7_Time}</Punch7_Time>
+    <Punch8_Time>${record.Punch8_Time}</Punch8_Time>
+    <Punch9_Time>${record.Punch9_Time}</Punch9_Time>
+    <Punch10_Time>${record.Punch10_Time}</Punch10_Time>
+    <Punch11_Time>${record.Punch11_Time}</Punch11_Time>
+    <Punch12_Time>${record.Punch12_Time}</Punch12_Time>
+    <OutPunch_Time>${record.OutPunch_Time}</OutPunch_Time>
+  </attendance-daily>`;
+        }).join('')}</DocumentElement>`;
+
+        // Send XML response
+        res.set('Content-Type', 'application/xml');
+        res.send(formattedXML);
     } catch (err) {
         console.error('Error fetching attendance data:', err);
         res.status(500).json({ error: 'Internal Server Error' });
